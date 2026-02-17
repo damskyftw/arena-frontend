@@ -104,10 +104,11 @@ function App() {
                           fontSize: '12px',
                         }}
                         labelFormatter={(v) => `Day ${v}`}
-                        formatter={(value: number | undefined, name: string) => {
-                          const agent = getAgent(name)
-                          return [`$${value ?? 0}`, agent?.name || name]
-                        }}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        formatter={((value: any, name: any) => {
+                          const agent = getAgent(String(name))
+                          return [`$${value}`, agent?.name || name]
+                        }) as any}
                       />
                       {agents.map(agent => (
                         <Line
