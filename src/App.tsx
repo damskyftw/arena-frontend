@@ -104,9 +104,9 @@ function App() {
                           fontSize: '12px',
                         }}
                         labelFormatter={(v) => `Day ${v}`}
-                        formatter={(value: number, name: string) => {
+                        formatter={(value: number | undefined, name: string) => {
                           const agent = getAgent(name)
-                          return [`$${value}`, agent?.name || name]
+                          return [`$${value ?? 0}`, agent?.name || name]
                         }}
                       />
                       {agents.map(agent => (
