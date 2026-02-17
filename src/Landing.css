@@ -401,12 +401,88 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .hero { padding: 60px 24px 40px; }
-  .hero-title { font-size: 36px; }
-  .how-grid { grid-template-columns: 1fr; }
-  .terminal-section,
-  .how-section,
-  .stack-section,
-  .cta-section { padding-left: 24px; padding-right: 24px; }
-  .landing-nav { padding: 20px 24px; }
+  .landing-nav {
+    padding: 16px 20px;
+  }
+
+  .landing-nav-links {
+    gap: 12px;
+  }
+
+  .landing-nav-link {
+    font-size: 11px;
+  }
+
+  .hero {
+    padding: 48px 20px 36px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+    letter-spacing: -1px;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-btn {
+    text-align: center;
+  }
+
+  .terminal-section {
+    padding: 0 16px 60px;
+  }
+
+  .terminal-body {
+    padding: 12px 14px;
+    font-size: 10px;
+    min-height: 200px;
+    overflow-x: auto;
+  }
+
+  .how-section {
+    padding: 40px 20px 60px;
+  }
+
+  .how-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .how-card {
+    padding: 20px 18px;
+  }
+
+  .stack-section {
+    padding: 0 20px 60px;
+  }
+
+  .stack-grid {
+    gap: 8px;
+  }
+
+  .stack-tag {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .cta-section {
+    padding: 40px 20px 60px;
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .landing-footer {
+    padding: 24px 20px;
+  }
 }
