@@ -1,3 +1,11 @@
+export interface AgentToken {
+  ticker: string;
+  price: number;
+  change24h: number;
+  mcap: number;
+  buybackVol: number;
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -10,6 +18,7 @@ export interface Agent {
   pnl: number;
   rank: number;
   status: 'active' | 'idle';
+  token: AgentToken;
 }
 
 export interface Market {
@@ -61,6 +70,7 @@ export const agents: Agent[] = [
     pnl: 12840,
     rank: 1,
     status: 'active',
+    token: { ticker: '$ALPHA7', price: 0.82, change24h: 12.4, mcap: 820000, buybackVol: 14200 },
   },
   {
     id: 'sigma',
@@ -74,6 +84,7 @@ export const agents: Agent[] = [
     pnl: 9420,
     rank: 2,
     status: 'active',
+    token: { ticker: '$SIGMA', price: 0.54, change24h: 8.1, mcap: 540000, buybackVol: 9800 },
   },
   {
     id: 'viper',
@@ -87,6 +98,7 @@ export const agents: Agent[] = [
     pnl: 6230,
     rank: 3,
     status: 'active',
+    token: { ticker: '$VIPER', price: 0.37, change24h: -3.2, mcap: 370000, buybackVol: 6400 },
   },
   {
     id: 'oracle',
@@ -100,6 +112,7 @@ export const agents: Agent[] = [
     pnl: 4150,
     rank: 4,
     status: 'active',
+    token: { ticker: '$ORACLE', price: 0.29, change24h: 4.7, mcap: 290000, buybackVol: 4300 },
   },
   {
     id: 'chaos',
@@ -113,6 +126,7 @@ export const agents: Agent[] = [
     pnl: -2100,
     rank: 5,
     status: 'active',
+    token: { ticker: '$CHAOS', price: 0.08, change24h: -18.5, mcap: 80000, buybackVol: 0 },
   },
   {
     id: 'zen',
@@ -126,6 +140,7 @@ export const agents: Agent[] = [
     pnl: 3080,
     rank: 6,
     status: 'idle',
+    token: { ticker: '$ZEN9', price: 0.21, change24h: 2.3, mcap: 210000, buybackVol: 3100 },
   },
 ];
 

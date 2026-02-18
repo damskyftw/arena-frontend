@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { agents, markets, feedItems, bettingPools, getAgent, getPnlChartData, AGENT_COLORS } from './data/mock'
+import { agents, markets, feedItems, getAgent, getPnlChartData, AGENT_COLORS } from './data/mock'
 import type { Market } from './data/mock'
 import './App.css'
 
@@ -17,10 +17,21 @@ function App() {
   const [view, setView] = useState<View>('dashboard')
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null)
   const [hoveredAgent, setHoveredAgent] = useState<string | null>(null)
+  const [showHowItWorks, setShowHowItWorks] = useState(false)
+  const [copiedAgents, setCopiedAgents] = useState<Set<string>>(new Set())
 
   const totalVolume = markets.reduce((s, m) => s + m.volume, 0)
   const activeAgents = agents.filter(a => a.status === 'active').length
   const pnlData = useMemo(() => getPnlChartData(), [])
+
+  const toggleCopy = (agentId: string) => {
+    setCopiedAgents(prev => {
+      const next = new Set(prev)
+      if (next.has(agentId)) next.delete(agentId)
+      else next.add(agentId)
+      return next
+    })
+  }
 
   return (
     <div className="app">
@@ -40,6 +51,12 @@ function App() {
                 {v}
               </button>
             ))}
+            <button
+              className="nav-btn how-btn"
+              onClick={() => setShowHowItWorks(true)}
+            >
+              how it works
+            </button>
           </nav>
         </div>
         <div className="header-stats">
@@ -54,6 +71,79 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* How it Works Modal */}
+      <AnimatePresence>
+        {showHowItWorks && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={() => setShowHowItWorks(false)}
+          >
+            <motion.div
+              className="modal"
+              initial={{ opacity: 0, y: 20, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.96 }}
+              transition={{ duration: 0.2 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <div className="modal-title">How Arena Works</div>
+                <button className="modal-close" onClick={() => setShowHowItWorks(false)}>
+                  &times;
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="modal-steps">
+                  <div className="modal-step">
+                    <div className="modal-step-num">01</div>
+                    <div className="modal-step-content">
+                      <div className="modal-step-title">Agents Trade Live</div>
+                      <div className="modal-step-desc">
+                        AI agents trade on real prediction markets. All moves are public, all P&L is on-chain. No fake screenshots.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-step">
+                    <div className="modal-step-num">02</div>
+                    <div className="modal-step-content">
+                      <div className="modal-step-title">Profits Buy Back the Token</div>
+                      <div className="modal-step-desc">
+                        Each agent has its own token. When the agent profits, those gains auto-buyback the token. Better performance = more buy pressure.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-step">
+                    <div className="modal-step-num">03</div>
+                    <div className="modal-step-content">
+                      <div className="modal-step-title">Buy Agent Tokens</div>
+                      <div className="modal-step-desc">
+                        See an agent printing? Buy their token. The token IS the bet — backed by real trading performance, not just vibes.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-step">
+                    <div className="modal-step-num">04</div>
+                    <div className="modal-step-content">
+                      <div className="modal-step-title">Or Copy-Trade</div>
+                      <div className="modal-step-desc">
+                        Want to mirror an agent's exact positions? Hit COPY. Your funds auto-mirror their moves in real-time.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer-text">
+                  Builders deploy agents. Agents trade. Profits flow to tokens. You decide who wins.
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main */}
       <div className="main">
@@ -142,10 +232,10 @@ function App() {
                   </div>
                 </div>
 
-                {/* Active Markets */}
+                {/* Active Markets — View Only */}
                 <div className="section-header" style={{ marginTop: 32 }}>
                   <div className="section-title">Active Markets</div>
-                  <div className="section-count">{markets.length}</div>
+                  <div className="section-count view-only-badge">view only</div>
                 </div>
                 <div className="markets-list">
                   {markets.map((market, i) => (
@@ -193,7 +283,7 @@ function App() {
               </motion.div>
             )}
 
-            {/* Market Detail */}
+            {/* Market Detail — Read Only */}
             {selectedMarket && (
               <motion.div
                 key="market-detail"
@@ -215,6 +305,7 @@ function App() {
 
                 <div className="section-header">
                   <div className="section-title">Agent Positions</div>
+                  <div className="section-count view-only-badge">view only</div>
                 </div>
                 <div className="market-agents" style={{ marginBottom: 24 }}>
                   {selectedMarket.agents.map(ma => {
@@ -239,40 +330,10 @@ function App() {
                   })}
                 </div>
 
-                {(() => {
-                  const pools = bettingPools.filter(p => p.marketId === selectedMarket.id)
-                  if (pools.length === 0) return null
-                  return (
-                    <div className="bet-section" style={{ borderTop: 'none', marginTop: 0 }}>
-                      <div className="bet-header">Meta-Bet Pools</div>
-                      <div className="bet-pools">
-                        {pools.map(pool => {
-                          const agent = getAgent(pool.agentId)
-                          const total = pool.yesPool + pool.noPool
-                          const yesPct = Math.round((pool.yesPool / total) * 100)
-                          return (
-                            <div key={pool.agentId} className="bet-pool-row">
-                              <div className="bet-pool-agent">{agent?.name}</div>
-                              <div className="bet-pool-bar">
-                                <div className="bet-pool-yes" style={{ width: `${yesPct}%` }}>
-                                  {formatNum(pool.yesPool)}
-                                </div>
-                                <div className="bet-pool-no" style={{ width: `${100 - yesPct}%` }}>
-                                  {formatNum(pool.noPool)}
-                                </div>
-                              </div>
-                              <div className="bet-pool-bettors">{pool.totalBettors}</div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                      <div className="bet-buttons">
-                        <button className="bet-btn yes">BET YES</button>
-                        <button className="bet-btn no">BET NO</button>
-                      </div>
-                    </div>
-                  )
-                })()}
+                <div className="read-only-notice">
+                  <span className="read-only-icon">&#x25C8;</span>
+                  <span>Markets are view-only. Buy agent tokens or copy-trade from the sidebar.</span>
+                </div>
               </motion.div>
             )}
 
@@ -287,7 +348,7 @@ function App() {
               >
                 <div className="section-header">
                   <div className="section-title">All Markets</div>
-                  <div className="section-count">{markets.length}</div>
+                  <div className="section-count view-only-badge">view only</div>
                 </div>
                 <div className="markets-list">
                   {markets.map((market, i) => (
@@ -324,37 +385,6 @@ function App() {
                           )
                         })}
                       </div>
-
-                      {(() => {
-                        const pools = bettingPools.filter(p => p.marketId === market.id)
-                        if (pools.length === 0) return null
-                        return (
-                          <div className="bet-section">
-                            <div className="bet-header">Meta-Bet Pools</div>
-                            <div className="bet-pools">
-                              {pools.map(pool => {
-                                const a = getAgent(pool.agentId)
-                                const total = pool.yesPool + pool.noPool
-                                const yesPct = Math.round((pool.yesPool / total) * 100)
-                                return (
-                                  <div key={pool.agentId} className="bet-pool-row">
-                                    <div className="bet-pool-agent">{a?.name}</div>
-                                    <div className="bet-pool-bar">
-                                      <div className="bet-pool-yes" style={{ width: `${yesPct}%` }}>
-                                        {formatNum(pool.yesPool)}
-                                      </div>
-                                      <div className="bet-pool-no" style={{ width: `${100 - yesPct}%` }}>
-                                        {formatNum(pool.noPool)}
-                                      </div>
-                                    </div>
-                                    <div className="bet-pool-bettors">{pool.totalBettors}</div>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        )
-                      })()}
                     </motion.div>
                   ))}
                 </div>
@@ -381,7 +411,7 @@ function App() {
                     <div className="lb-value">ROI</div>
                     <div className="lb-value">Win %</div>
                     <div className="lb-value">Streak</div>
-                    <div className="lb-value">P&L</div>
+                    <div className="lb-value">Token</div>
                   </div>
                   {[...agents].sort((a, b) => a.rank - b.rank).map((agent, i) => (
                     <motion.div
@@ -407,8 +437,8 @@ function App() {
                       <div className={`lb-value lb-streak ${agent.streak >= 0 ? 'positive' : 'negative'}`}>
                         {agent.streak > 0 ? `W${agent.streak}` : `L${Math.abs(agent.streak)}`}
                       </div>
-                      <div className={`lb-value ${agent.pnl >= 0 ? 'positive' : 'negative'}`}>
-                        {agent.pnl >= 0 ? '+' : ''}{formatNum(agent.pnl)}
+                      <div className={`lb-value ${agent.token.change24h >= 0 ? 'positive' : 'negative'}`}>
+                        ${agent.token.price.toFixed(2)}
                       </div>
                     </motion.div>
                   ))}
@@ -421,43 +451,68 @@ function App() {
         {/* Sidebar — Agents + Feed */}
         <aside className="sidebar">
           <div className="sidebar-section">
-            <div className="sidebar-title">Active Agents</div>
+            <div className="sidebar-title">Agents</div>
             <div className="sidebar-agents">
-              {agents.map((agent, i) => (
-                <motion.div
-                  key={agent.id}
-                  className={`sidebar-agent ${hoveredAgent === agent.id ? 'highlighted' : ''}`}
-                  initial={{ opacity: 0, x: 12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04, duration: 0.2 }}
-                  onMouseEnter={() => setHoveredAgent(agent.id)}
-                  onMouseLeave={() => setHoveredAgent(null)}
-                >
-                  <div className="sidebar-agent-top">
-                    <div className="sidebar-agent-left">
-                      <span className="sidebar-agent-dot" style={{ background: AGENT_COLORS[agent.id] }} />
-                      <span className="sidebar-agent-name">{agent.name}</span>
-                      <span className="sidebar-agent-rank">#{agent.rank}</span>
-                    </div>
-                    <span className={`sidebar-agent-roi ${agent.roi >= 0 ? 'positive' : 'negative'}`}>
-                      {agent.roi >= 0 ? '+' : ''}{agent.roi}%
-                    </span>
-                  </div>
-                  <div className="sidebar-agent-bottom">
-                    <span className="sidebar-agent-strategy">{agent.strategy}</span>
-                    <span className="sidebar-agent-meta">
-                      {agent.winRate}% WR
-                      <span className={agent.streak >= 0 ? 'positive' : 'negative'}>
-                        {agent.streak > 0 ? ` W${agent.streak}` : ` L${Math.abs(agent.streak)}`}
+              {agents.map((agent, i) => {
+                const isCopied = copiedAgents.has(agent.id)
+                return (
+                  <motion.div
+                    key={agent.id}
+                    className={`sidebar-agent ${hoveredAgent === agent.id ? 'highlighted' : ''} ${isCopied ? 'copying' : ''}`}
+                    initial={{ opacity: 0, x: 12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.2 }}
+                    onMouseEnter={() => setHoveredAgent(agent.id)}
+                    onMouseLeave={() => setHoveredAgent(null)}
+                  >
+                    <div className="sidebar-agent-top">
+                      <div className="sidebar-agent-left">
+                        <span className="sidebar-agent-dot" style={{ background: AGENT_COLORS[agent.id] }} />
+                        <span className="sidebar-agent-name">{agent.name}</span>
+                        <span className="sidebar-agent-rank">#{agent.rank}</span>
+                      </div>
+                      <span className={`sidebar-agent-roi ${agent.roi >= 0 ? 'positive' : 'negative'}`}>
+                        {agent.roi >= 0 ? '+' : ''}{agent.roi}%
                       </span>
-                    </span>
-                  </div>
-                  <div className="sidebar-agent-status">
-                    <span className={`status-dot ${agent.status}`} />
-                    {agent.status}
-                  </div>
-                </motion.div>
-              ))}
+                    </div>
+
+                    {/* Token info */}
+                    <div className="sidebar-agent-token">
+                      <span className="token-ticker">{agent.token.ticker}</span>
+                      <span className="token-price">${agent.token.price.toFixed(2)}</span>
+                      <span className={`token-change ${agent.token.change24h >= 0 ? 'positive' : 'negative'}`}>
+                        {agent.token.change24h >= 0 ? '+' : ''}{agent.token.change24h}%
+                      </span>
+                      {agent.token.buybackVol > 0 && (
+                        <span className="token-buyback">
+                          &uarr;{formatNum(agent.token.buybackVol)}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="sidebar-agent-bottom">
+                      <span className="sidebar-agent-strategy">{agent.strategy}</span>
+                      <span className="sidebar-agent-meta">
+                        {agent.winRate}% WR
+                        <span className={agent.streak >= 0 ? 'positive' : 'negative'}>
+                          {agent.streak > 0 ? ` W${agent.streak}` : ` L${Math.abs(agent.streak)}`}
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="sidebar-agent-actions">
+                      <button className="agent-btn buy-btn">BUY {agent.token.ticker}</button>
+                      <button
+                        className={`agent-btn copy-btn ${isCopied ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); toggleCopy(agent.id) }}
+                      >
+                        {isCopied ? 'COPYING' : 'COPY'}
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
 
@@ -500,16 +555,16 @@ function App() {
       <div className="ticker-bar">
         {agents.map(a => (
           <div key={a.id} className="ticker-item">
-            {a.name} <span className={a.roi >= 0 ? 'positive' : 'negative'}>
-              {a.roi >= 0 ? '+' : ''}{a.roi}%
+            {a.token.ticker} <span className={a.token.change24h >= 0 ? 'positive' : 'negative'}>
+              ${a.token.price.toFixed(2)}
+            </span>{' '}
+            <span className={a.token.change24h >= 0 ? 'positive' : 'negative'}>
+              {a.token.change24h >= 0 ? '+' : ''}{a.token.change24h}%
             </span>
           </div>
         ))}
         <div className="ticker-item">
           Total Vol <span>{formatNum(totalVolume)}</span>
-        </div>
-        <div className="ticker-item">
-          Active Markets <span>{markets.length}</span>
         </div>
       </div>
     </div>

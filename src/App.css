@@ -885,6 +885,235 @@
   margin-top: 4px;
 }
 
+/* ── How it Works Button ── */
+.how-btn {
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border);
+  margin-left: 4px;
+}
+
+.how-btn:hover {
+  color: var(--text-primary) !important;
+  border-color: var(--border-accent);
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.modal-close {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.modal-step-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--green);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.modal-step-content {
+  flex: 1;
+}
+
+.modal-step-title {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.modal-step-desc {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.modal-footer-text {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+
+/* ── Token Info (Sidebar) ── */
+.sidebar-agent-token {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.token-ticker {
+  color: var(--text-primary);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.token-price {
+  color: var(--text-secondary);
+}
+
+.token-change {
+  font-size: 0.7rem;
+}
+
+.token-change.positive { color: var(--green); }
+.token-change.negative { color: var(--red); }
+
+.token-buyback {
+  color: var(--green);
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+/* ── Agent Action Buttons ── */
+.sidebar-agent-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.agent-btn {
+  flex: 1;
+  padding: 6px 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius);
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.buy-btn {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid transparent;
+}
+
+.buy-btn:hover {
+  background: var(--green);
+  color: var(--bg-primary);
+}
+
+.copy-btn {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.copy-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+
+.copy-btn.active {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border-color: transparent;
+}
+
+/* Sidebar agent with active copy */
+.sidebar-agent.copying {
+  border-left-color: var(--blue);
+  background: var(--bg-card);
+}
+
+/* ── View Only Badge ── */
+.view-only-badge {
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Read Only Notice ── */
+.read-only-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.read-only-icon {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 .positive { color: var(--green); }
 .negative { color: var(--red); }
 
@@ -995,5 +1224,22 @@
 
   .bet-buttons {
     flex-direction: column;
+  }
+
+  .modal {
+    max-width: 100%;
+    margin: 16px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-step {
+    gap: 12px;
+  }
+
+  .how-btn {
+    display: none;
   }
 }
